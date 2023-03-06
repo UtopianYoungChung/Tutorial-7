@@ -1,0 +1,89 @@
+---
+title: "How long did each Australia Prime Minister lived, by year of birth?"
+author: "Joseph Chung"
+date: today
+date-format: "MMM D, YYYY"
+format:
+  pdf:
+    documentclass: article
+    geometry: margin = 1in
+    abstract: Tutorial 7 topic Web Scraping
+    number-sections: true
+    colorlinks: true
+    lof : true
+    lot : true
+thanks: "Code and data are available at: https://github.com/UtopianYoungChung/Homicides-in-Toronto.git"
+bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+#knitr::opts_chunk$set(echo = FALSE)
+#Load libraries
+library(rvest)
+library(xml2)
+library(tidyverse)
+library(palmerpenguins)
+library(knitr)
+library(ggplot2)
+```
+
+# Introduction
+
+# Data
+
+```{r}
+#Generate a nice table
+
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: tbl-lifespan
+#| tbl-cap: Australian Prime Minister and their life span
+
+cleaned_data |>
+  head() |>
+  knitr::kable(
+    col.names = c("Prime Minister", 
+                  "Birth year", 
+                  "Death year", 
+                  "Age at death")
+  )
+```
+
+
+```{r}
+#Plotting the table
+
+#| messages: false
+#| echo: false
+#| warning: false
+#| label: fig-lifespan
+#| fig-cap: Australian Prime Minister and their life span
+cleaned_data |>
+  mutate(
+    still_alive = if_else(is.na(died), "Yes", "No"),
+    died = if_else(is.na(died), as.integer(2023), died)
+  ) |>
+  mutate(name = as_factor(name)) |>
+  ggplot(aes(
+    x = born,
+    xend = died,
+    y = name,
+    yend = name,
+    color = still_alive
+  )) +
+  geom_segment() +
+  labs(
+    x = "Year of birth",
+    y = "Prime minister",
+    color = "PM is currently alive",
+    title = "How long each Australia Prime Minister lived, by year of birth"
+  ) +
+  theme_minimal() +
+  scale_color_brewer(palette = "Set1") +
+  theme(legend.position = "bottom")
+
+```
+
+
+# Reflection
