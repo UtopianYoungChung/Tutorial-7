@@ -12,13 +12,11 @@ format:
     colorlinks: true
     lof : true
     lot : true
-thanks: "Code and data are available at: https://github.com/UtopianYoungChung/Homicides-in-Toronto.git"
-bibliography: bibliography.bib
+thanks: "Code and data are available at: https://github.com/UtopianYoungChung/Tutorial-7.git"
+bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
-#knitr::opts_chunk$set(echo = FALSE)
-#Load libraries
 library(rvest)
 library(xml2)
 library(tidyverse)
@@ -27,21 +25,25 @@ library(knitr)
 library(ggplot2)
 ```
 
-# Introduction
+# Findings
+
+I tried to copy one of the examples from the textbook after reading about what was expected for this week's tutorial [@citeinf312]. I first attempted to scrape data from the provided Wikipedia websites using the "SelectorGadget," but I couldn't seem to get it to work. When I couldn't get it to work, I manually scraped the data from the websites using the html element (".wikitable") code. For each site, on three out of the four sites, the code extracted the data from a small table, which is unimportant for the tutorial. But luckily, one site (Australia) came back with information from a large table with the dataset we need (although we found some missing values that will be discussed later in the paper).
 
 # Data
 
+The data was scraped from "List of prime ministers of Australia -- Wikipedia" [@citewebsite] The scraped data contained 10 variables and 76 observations named 'parse_data_selector_gadget." From this set, we cleaned the data to our needs, and it was reduced to 4 variables and 31 observations: name, born, died, and age_at_death, as shown in @tbl-lifespan. @fig-lifespan illustrates each Prime Minister's lifespan on a graph.
+\newpage
 ```{r}
-#Generate a nice table
-
 #| messages: false
 #| echo: false
 #| warning: false
 #| label: tbl-lifespan
 #| tbl-cap: Australian Prime Minister and their life span
+pm_lifespan <- read_csv(here::here("inputs/data/cleaned_data.csv"))
+pm_lifespan <- pm_lifespan %>% select(-...1)
 
-cleaned_data |>
-  head() |>
+pm_lifespan %>%
+  head() %>%
   knitr::kable(
     col.names = c("Prime Minister", 
                   "Birth year", 
@@ -50,19 +52,21 @@ cleaned_data |>
   )
 ```
 
-
 ```{r}
-#Plotting the table
-
 #| messages: false
 #| echo: false
 #| warning: false
 #| label: fig-lifespan
+#| fig-width: 8
+#| fig-height: 14
 #| fig-cap: Australian Prime Minister and their life span
-cleaned_data |>
+pm_lifespan <- read_csv(here::here("inputs/data/cleaned_data.csv"))
+pm_lifespan <- pm_lifespan %>% select(-...1)
+
+pm_lifespan |>
   mutate(
     still_alive = if_else(is.na(died), "Yes", "No"),
-    died = if_else(is.na(died), as.integer(2023), died)
+    died = if_else(is.na(died), as.integer(2023), as.integer(as.numeric(died)))
   ) |>
   mutate(name = as_factor(name)) |>
   ggplot(aes(
@@ -77,13 +81,21 @@ cleaned_data |>
     x = "Year of birth",
     y = "Prime minister",
     color = "PM is currently alive",
-    title = "How long each Australia Prime Minister lived, by year of birth"
+    title = "How long each UK Prime Minister lived, by year of birth"
   ) +
   theme_minimal() +
   scale_color_brewer(palette = "Set1") +
   theme(legend.position = "bottom")
 
 ```
-
+\newpage
 
 # Reflection
+
+However, there was missing data on the Prime Ministers who were still alive; 8 observations were removed from the plot. Therefore, we are missing the information of the PMs who have yet to die; all 4 variables on the PM are missing.
+
+With more resources and time, I propose doing some more scraping and developing codes to scrape all the information.
+
+\newpage
+ 
+# References
